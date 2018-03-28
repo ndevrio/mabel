@@ -5,26 +5,36 @@ from PIL import Image, ImageFont, ImageDraw
 from subprocess import call
 
 def print_label(input, index):
-	size = 600, 280
+	#size = 1200, 560
+	size = 300, 300
 
 	template = Image.open("template.png")
 
-	call(["obabel", ("-:%s" % input[0]), "-O", "molecule.png"])
+	m_in = readstring("smi", "-:%s" % input[0])
+	#m_in.draw(filename="molecule.png")
+	call(["obabel", ("-:=%s" % input[0]), "-O", "molecule.png"])
 	mol = Image.open("molecule.png")
 	call(["rm", "molecule.png"])
 
 	label = "%s\n%s g/mol\n%s" % (input[1], input[2], input[0])
 	qr_img = qrcode.make(label)
 
-	qr_img.thumbnail(size, Image.ANTIALIAS)
-	template.paste(mol, (0, 30))
-	template.paste(qr_img, (300, 30))
+	qr_img = qr_img.resize((300, 300), Image.ANTIALIAS)
+	mol = mol.resize((500, 500), Image.ANTIALIAS)
+	template.paste(mol, (40, 60))
+	template.paste(qr_img, (650, 50))
 
 
 	d = ImageDraw.Draw(template)
-	fnt = ImageFont.truetype('/usr/share/fonts/true/type/ubuntu-font-family/UbuntuMono-R.ttf', 25)
-	w, h = d.textsize(("%s\t\t%s g/mol" % (input[1], input[2])), font=fnt)
-	d.text(((600-w)/2, 20), ("%s\t\t%s g/mol" % (input[1], input[2])), font=fnt, fill=(0,0,0))
+	fnt = ImageFont.truetype('/usr/share/fonts/true/type/ubuntu-font-family/UbuntuMono-R.ttf', 60)
+	w, h = d.textsize(("%s" % input[1]), font=fnt)
+	d.text(((600-w)/2, 35), ("%s" % input[1]), font=fnt, fill=(0,0,0))
+
+	fnt = ImageFont.truetype('/usr/share/fonts/true/type/ubuntu-font-family/UbuntuMono-R.ttf', 40)
+	w, h = d.textsize(("MW: %.2f" % m_in.molwt), font=fnt)
+	d.text(((1600-w)/2,430), ("MW: %.2f" % m_in.molwt), font=fnt, fill=(0,0,0))
+	w, h = d.textsize(("%s" % m_in.formula), font=fnt)
+	d.text(((1600-w)/2,380), ("%s" % m_in.formula), font=fnt, fill=(0,0,0))
 
 	template.save("label_%d.png" % index)
 
