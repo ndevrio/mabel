@@ -15,7 +15,7 @@ def print_label(input, index):
 	#m_in.draw(filename="molecule.png")
 	call(["obabel", ("-:=%s" % input[0]), "-O", "molecule.png"])
 	mol = Image.open("molecule.png")
-	call(["rm", "molecule.png"])
+	#call(["rm", "molecule.png"])
 
 	label = "%s\n%s g/mol\n%s" % (input[1], input[2], input[0])
 	qr_img = qrcode.make(label)
@@ -23,7 +23,7 @@ def print_label(input, index):
 	qr_img = qr_img.resize((300, 300), Image.ANTIALIAS)
 	mol = mol.resize((500, 500), Image.ANTIALIAS)
 	template.paste(mol, (00, 60))
-	template.paste(qr_img, (525, 50))
+	template.paste(qr_img, (625, 50))
 
 
 	d = ImageDraw.Draw(template)
@@ -38,8 +38,8 @@ def print_label(input, index):
 	d.text(((1350-w)/2,430), ("MW: %.2f" % m_in.molwt), font=fnt, fill=(0,0,0))
 	w, h = d.textsize(("%s" % m_in.formula), font=fnt)
 	d.text(((1350-w)/2,380), ("%s" % m_in.formula), font=fnt, fill=(0,0,0))
-	w, h = d.textsize(("Created: %s" % input[3]), font=fnt25)
-	d.text(((1350-w)/2,480), ("Created: %s" % input[3]), font=fnt25, fill=(0,0,0))
+	w, h = d.textsize(("%s" % input[3]), font=fnt25)
+	d.text(((1350-w)/2,480), ("%s" % input[3]), font=fnt25, fill=(0,0,0))
 
 	offset = 380
 	for line in textwrap.wrap(("%s" % input[4]), width=23):
